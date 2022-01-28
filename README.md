@@ -1,3 +1,141 @@
+## Домашнее задание к занятию "3.3. Операционные системы, лекция 2"
+
+<details>
+	
+**1 На лекции мы познакомились с node_exporter. В демонстрации его исполняемый файл запускался в background. Этого достаточно для демо, но не для настоящей production-системы, где процессы должны находиться под внешним управлением. Используя знания из лекции по systemd, создайте самостоятельно простой unit-файл для node_exporter:
+поместите его в автозагрузку, предусмотрите возможность добавления опций к запускаемому процессу через внешний файл (посмотрите, например, на systemctl cat cron),
+удостоверьтесь, что с помощью systemctl процесс корректно стартует, завершается, а после перезагрузки автоматически поднимается.**
+	
+Установка node_exporter
+	
+	$ wget https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz
+	$ tar xvfz node_exporter-1.3.1.linux-amd64.tar.gz
+Создание полльзователя службы
+	
+	$ sudo useradd -r -M -s /bin/false node_exporter
+	
+Создаем unit файл
+	
+	$ sudo vim /etc/systemd/system/node_exporter.service
+
+	[Unit]
+	Description=Prometheus Node Exporter
+	Wants=network-online.target
+	After=network-online.target
+
+	[Service]
+	User=node_exporter
+	Group=node_exporter
+	Type=simple
+	ExecStart=/home/vagrant/node_exporter-1.3.1.linux-amd64/node_exporter $EXTRA_OPTS
+
+	[Install]
+	WantedBy=multi-user.target
+
+Запуск процесса
+	
+	$ sudo systemctl daemon-reload
+	$ sudo systemctl enable --now node_exporter.service
+
+Разрешаем порт по умолчанию
+	
+	$ sudo iptables -A INPUT -p tcp --dport 9100 -j ACCEPT
+
+Проверяем статус
+	
+	$ sudo systemctl status node_exporter.service
+	Active: active (running)
+	
+**2 Ознакомьтесь с опциями node_exporter и выводом /metrics по-умолчанию. Приведите несколько опций, которые вы бы выбрали для базового мониторинга хоста по CPU, памяти, диску и сети.**
+
+Процессор 
+	
+	$ curl http://localhost:9100/metrics | grep node_cpu
+	node_cpu_seconds_total{cpu="0",mode="user"} — время выполнения процессов, которые выполняются в режиме пользователя.
+	node_cpu_seconds_total{cpu="0",mode="system"} — время выполнения процессов, которые выполняются в режиме ядра.
+
+Память 
+	
+	$ curl http://localhost:9100/metrics | grep node_memory
+	node_memory_MemTotal_bytes — общий объем памяти на машине.
+	node_memory_MemFree_bytes — объем свободной памяти, которая может быть освобождена.
+	
+Диск 
+	
+	$ curl http://localhost:9100/metrics | grep node_disk
+	node_disk_read_time_seconds_total — количество секунд, затраченных на чтение.
+	node_disk_io_now — количество операций ввода-вывода (I/O), выполняемых в настоящий момент.
+	
+Сеть 
+	
+	$ curl http://localhost:9100/metrics | grep node_network
+	node_network_receive_bytes_total — объем полученных данных (в байтах).
+	node_network_receive_errs_total — количество возникших ошибок при получении.
+	
+**3 Установите в свою виртуальную машину Netdata. Воспользуйтесь готовыми пакетами для установки (sudo apt install -y netdata). После успешной установки:
+в конфигурационном файле /etc/netdata/netdata.conf в секции [web] замените значение с localhost на bind to = 0.0.0.0,
+добавьте в Vagrantfile проброс порта Netdata на свой локальный компьютер и сделайте vagrant reload:
+config.vm.network "forwarded_port", guest: 19999, host: 19999
+После успешной перезагрузки в браузере на своем ПК (не в виртуальной машине) вы должны суметь зайти на localhost:19999. Ознакомьтесь с метриками, которые по умолчанию собираются Netdata и с комментариями, которые даны к этим метрикам.**
+
+	> vagrant port
+	22 (guest) => 2222 (host)
+	80 (guest) => 8080 (host)
+ 	19999 (guest) => 19999 (host)
+
+	Chrome > localhost:19999 > Netdata Ok
+	
+**4 Можно ли по выводу dmesg понять, осознает ли ОС, что загружена не на настоящем оборудовании, а на системе виртуализации?**
+
+Можно 
+	
+	$ dmesg | grep -i 'Hypervisor detected'
+	[    0.000000] Hypervisor detected: KVM
+	(Kernel-based Virtual Machine)	
+	
+**5 Как настроен sysctl fs.nr_open на системе по-умолчанию? Узнайте, что означает этот параметр. Какой другой существующий лимит не позволит достичь такого числа (ulimit --help)?**
+
+	$ sysctl fs.nr_open
+	1048576 - максимальное количество файловых дескрипторов, которое может выделить процесс (1024 * 1024 = 1048576).
+	$ ulimit -n 
+	1024 - мягкий лимит на пользователя (может быть изменен)
+
+**6 Запустите любой долгоживущий процесс (не ls, который отработает мгновенно, а, например, sleep 1h) в отдельном неймспейсе процессов; покажите, что ваш процесс работает под PID 1 через nsenter. Для простоты работайте в данном задании под root (sudo -i). Под обычным пользователем требуются дополнительные опции (--map-root-user) и т.д.**
+	
+	> PTS/0
+	$ sudo -i
+	$ unshare -f --pid --mount-proc /bin/sleep 1h
+	
+	> PTS/1
+ 	$ sudo -i
+	$ ps a | grep /bin/sleep
+	3728 pts/0    S+     0:00 unshare -f --pid --mount-proc /bin/sleep 1h
+   	3729 pts/0    S+     0:00 /bin/sleep 1h
+   	3746 pts/1    S+     0:00 grep --color=auto /bin/sleep
+	
+	$ nsenter --target 3729 --pid --mount
+	$ ps aux
+	USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+	root           1  0.0  0.0   5476   592 pts/0    S+   06:56   0:00 /bin/sleep 1h
+	root           2  0.1  0.4   7236  4060 pts/1    S    06:58   0:00 -bash
+	root          13  0.0  0.3   8892  3408 pts/1    R+   06:58   0:00 ps aux
+
+**7 Найдите информацию о том, что такое :(){ :|:& };:. Запустите эту команду в своей виртуальной машине Vagrant с Ubuntu 20.04 (это важно, поведение в других ОС не проверялось). Некоторое время все будет "плохо", после чего (минуты) – ОС должна стабилизироваться. Вызов dmesg расскажет, какой механизм помог автоматической стабилизации. Как настроен этот механизм по-умолчанию, и как изменить число процессов, которое можно создать в сессии?**
+
+	Fork bomb, определяет функцию с именем : вызывает саму себя дважды в фоновом режиме, с последующим делением. 
+	cgroup: fork rejected by pids controller in /user.slice/user-1000.slice/session-3.scope
+	Автоматическая стабилизация CGROUP, в виде ограничения на максимальное количество процессов пользователя с id 1000
+	Чсло процессов пользователя меняется через ulimit -u (число)
+	
+</details>
+
+
+
+
+
+
+
+
 ## Домашнее задание к занятию "3.3. Операционные системы, лекция 1"
 
 <details>
