@@ -112,8 +112,8 @@ DZ FS 3.5
 
 **12 Смонтируйте этот раздел в любую директорию, например, /tmp/new.**
 
-	$ mkdir /tmp/tst_mnt
-	$ mount /dev/vg0/lv0 /tmp/tst_mnt/
+	$ mkdir /tmp/new
+	$ mount /dev/vg0/lv0 /tmp/new/
 
 **13 Поместите туда тестовый файл, например wget https://mirror.yandex.ru/ubuntu/ls-lR.gz -O /tmp/new/test.gz.**
 	
