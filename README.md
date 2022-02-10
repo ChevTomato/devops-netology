@@ -1,3 +1,121 @@
+## Домашнее задание к занятию "3.6. Компьютерные сети, лекция 1"
+
+<details>
+	
+	
+**1 Работа c HTTP через телнет.**
+	
+- Подключитесь утилитой телнет к сайту stackoverflow.com, `telnet stackoverflow.com 80` <br>В ответе укажите полученный HTTP код, что он означает? Отправьте HTTP запрос:
+	```bash
+	GET /questions HTTP/1.0
+	HOST: stackoverflow.com
+	```
+	```
+	HTTP/1.1 301 Moved Permanently
+	cache-control: no-cache, no-store, must-revalidate
+	location: https://stackoverflow.com/questions
+	x-request-guid: 54dd7a02-b0cd-47e4-be9a-1b5cd472c87e
+	feature-policy: microphone 'none'; speaker 'none'
+	content-security-policy: upgrade-insecure-requests; frame-ancestors 'self' https://stackexchange.com
+	Accept-Ranges: bytes
+	Date: Thu, 10 Feb 2022 15:57:04 GMT
+	Via: 1.1 varnish
+	Connection: close
+	X-Served-By: cache-hel1410034-HEL
+	X-Cache: MISS
+	X-Cache-Hits: 0
+	X-Timer: S1644508624.212794,VS0,VE110
+	Vary: Fastly-SSL
+	X-DNS-Prefetch-Control: off
+	Set-Cookie: prov=fbfd317a-d943-7508-c2f4-992b443cb564; domain=.stackoverflow.com; expires=Fri, 01-Jan-2055 00:00:00 GMT; path=/; HttpOnly
+	Connection closed by foreign host.
+	```
+Код перенаправления " 301 Moved Permanently " протокола (HTTP) показывает, что запрошенный ресурс был окончательно перемещён в URL, указанный в заголовке Location https://stackoverflow.com/questions
+	
+	
+**2. Повторите задание 1 в браузере, используя консоль разработчика F12.**
+	
+- откройте вкладку `Network`, отправьте запрос http://stackoverflow.com, найдите первый ответ HTTP сервера, откройте вкладку `Headers`, укажите в ответе полученный HTTP код. проверьте время загрузки страницы, какой запрос обрабатывался дольше всего? приложите скриншот консоли браузера в ответ.
+	
+	![image](https://user-images.githubusercontent.com/95047357/153454117-1ea500c5-587a-419a-8865-87bf210c7025.png)
+	
+	Status Code: 307 Internal Redirect
+	Загрузка контента с основной страницы заняла 459ms
+	
+**3. Какой IP адрес у вас в интернете?**
+	
+	$ curl ifconfig.co
+	46.39.229.169
+	
+**4. Какому провайдеру принадлежит ваш IP адрес? Какой автономной системе AS? Воспользуйтесь утилитой `whois`**
+	
+	$ whois 46.39.229.169
+	route: 46.39.228.0/23
+	descr: GORCOM-NET
+	origin: AS29124
+	mnt-by: ISKRATELECOM-MNT
+	
+**5. Через какие сети проходит пакет, отправленный с вашего компьютера на адрес 8.8.8.8? Через какие AS? Воспользуйтесь утилитой `traceroute`**
+	
+	$ traceroute -An 8.8.8.8
+	Пакеты проходят через 
+	
+**6. Повторите задание 5 в утилите `mtr`. На каком участке наибольшая задержка - delay?**
+
+Наибольшая задержка на участке `AS15169 108.170.250.51`
+```ebr	
+$ mtr 8.8.8.8 -znrc 1
+Start: 2022-02-10T18:14:21+0000
+HOST: vagrant                     Loss%   Snt   Last   Avg  Best  Wrst StDev
+  1. AS???    10.0.2.2             0.0%     1    1.0   1.0   1.0   1.0   0.0
+  2. AS???    192.168.0.7          0.0%     1    4.5   4.5   4.5   4.5   0.0
+  3. AS???    10.4.224.1           0.0%     1    6.4   6.4   6.4   6.4   0.0
+  4. AS29124  95.143.212.112       0.0%     1    5.5   5.5   5.5   5.5   0.0
+  5. AS29124  81.200.9.237         0.0%     1    4.6   4.6   4.6   4.6   0.0
+  6. AS29124  81.200.9.150         0.0%     1    3.9   3.9   3.9   3.9   0.0
+  7. AS15169  108.170.250.33       0.0%     1    5.4   5.4   5.4   5.4   0.0
+  8. AS15169  108.170.250.51       0.0%     1   33.2  33.2  33.2  33.2   0.0
+  9. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 10. AS15169  172.253.66.110       0.0%     1   22.7  22.7  22.7  22.7   0.0
+ 11. AS15169  142.250.56.219       0.0%     1   25.0  25.0  25.0  25.0   0.0
+ 12. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 13. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 14. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 15. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 16. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 17. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 18. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 19. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 20. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 21. AS???    ???                 100.0     1    0.0   0.0   0.0   0.0   0.0
+ 22. AS15169  8.8.8.8              0.0%     1   21.3  21.3  21.3  21.3   0.0
+```
+	
+**7. Какие DNS сервера отвечают за доменное имя dns.google? Какие A записи? воспользуйтесь утилитой `dig`**
+```ns	
+$ dig +short NS dns.google
+ns2.zdns.google.
+ns1.zdns.google.
+ns4.zdns.google.
+ns3.zdns.google.
+```
+```a	
+$ dig +short A dns.google
+8.8.4.4
+8.8.8.8
+```
+	
+**8. Проверьте PTR записи для IP адресов из задания 7. Какое доменное имя привязано к IP? воспользуйтесь утилитой `dig`**
+
+
+
+</details>
+
+
+
+
+
+
 
 ## Домашнее задание к занятию "3.5. Файловые системы"
 
