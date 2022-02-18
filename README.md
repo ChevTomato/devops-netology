@@ -875,7 +875,8 @@ config.vm.network "forwarded_port", guest: 19999, host: 19999
 **4 С помощью базового файла конфигурации запустите Ubuntu 20.04 в VirtualBox посредством Vagrant:**
 
 	vagrant init, up
-
+	vagrant ssh-config > vagrant-ssh
+	 
  **5 Ознакомьтесь с графическим интерфейсом VirtualBox, посмотрите как выглядит виртуальная машина, которую создал для вас Vagrant, какие аппаратные 
  ресурсы ей выделены. Какие ресурсы выделены по-умолчанию?**
  
@@ -884,11 +885,13 @@ config.vm.network "forwarded_port", guest: 19999, host: 19999
 **6 Ознакомьтесь с возможностями конфигурации VirtualBox через Vagrantfile: документация. Как добавить оперативной памяти или ресурсов процессора 
  виртуальной машине?**
  
-	VagrantFile:
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-20.04"
 	config.vm.provider "virtualbox" do |v|
-  	  v.memory = 1024
-  	  v.cpus = 2
+	v.memory = 1024
+  	v.cpus = 2
 	end
+ end
 	
  **7 Команда vagrant ssh из директории, в которой содержится Vagrantfile, позволит вам оказаться внутри виртуальной машины без каких-либо дополнительных 
  настроек. Попрактикуйтесь в выполнении обсуждаемых команд в терминале Ubuntu.**
