@@ -1,3 +1,98 @@
+## Домашнее задание к занятию "3.8. Компьютерные сети, лекция 3"
+
+<details>
+	
+<br>**1 Подключитесь к публичному маршрутизатору в интернет. Найдите маршрут к вашему публичному IP**
+```
+telnet route-views.routeviews.org
+Username: rviews
+show ip route x.x.x.x/32
+show bgp x.x.x.x/32
+```
+```
+> show ip route 213.171.59.22
+Routing entry for 213.171.32.0/19, supernet
+... ok
+```
+```
+> show bgp 213.171.59.22
+BGP routing table entry for 213.171.32.0/19, version 886094
+... ok
+```
+	
+<br>**2 Создайте dummy0 интерфейс в Ubuntu. Добавьте несколько статических маршрутов. Проверьте таблицу маршрутизации**	
+* Создаём dummy0 интерфейс	
+```	
+$ modprobe -v dummy
+$ lsmod | grep dummy
+dummy                  16384  0
+$ ip link add dummy0 type dummy
+$ ip addr add 10.0.0.2/24 dev dummy0
+$ ip link set dummy0 up
+$ ip a
+```
+```	
+1: lo: inet 127.0.0.1/8 scope host lo
+2: eth0: inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic eth0
+3: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/ether 36:29:f2:70:c0:11 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.2/24 scope global dummy0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.3/24 scope global secondary dummy0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::3429:f2ff:fe70:c011/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+* Добавляем маршрут
+```
+$ ip route add 192.192.0.0/15 dev dummy0
+$ ip route
+default via 10.0.2.2 dev eth0 proto dhcp src 10.0.2.15 metric 100
+10.0.0.0/24 dev dummy0 proto kernel scope link src 10.0.0.2
+10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15
+10.0.2.2 dev eth0 proto dhcp scope link src 10.0.2.15 metric 100
+192.192.0.0/15 dev dummy0 scope link	
+```	
+	
+<br>**3 Проверьте открытые TCP порты в Ubuntu, какие протоколы и приложения используют эти порты? Приведите несколько примеров**
+```	
+$ ss -tpan
+State      Recv-Q     Send-Q         Local Address:Port         Peer Address:Port     Process     
+LISTEN     0          4096           127.0.0.53%lo:53                0.0.0.0:*                    
+LISTEN     0          128                  0.0.0.0:22                0.0.0.0:*                    
+ESTAB      0          0                  10.0.2.15:22               10.0.2.2:45332                
+LISTEN     0          128                     [::]:22                   [::]:*     	
+```
+* 53 - DNS, 22 - SSH <br>
+	
+<br>**4 Проверьте используемые UDP сокеты в Ubuntu, какие протоколы и приложения используют эти порты?**		
+```
+$ ss -upan
+State      Recv-Q     Send-Q         Local Address:Port         Peer Address:Port     Process          
+UNCONN     0          0              10.0.2.15%eth0:68          0.0.0.0:*  
+UNCONN     0   	
+``` 
+* 68 - Bootstrap Protocol <br>	
+	
+<br>**5 Используя diagrams.net, создайте L3 диаграмму вашей домашней сети или любой другой сети, с которой вы работали**	
+	
+![HomeNet](https://user-images.githubusercontent.com/95047357/154648628-66bbca8f-b334-41e6-8e34-0c19236c0d89.png)
+	
+	
+<br>
+</details>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 ## Домашнее задание к занятию "3.7. Компьютерные сети, лекция 2"
 
 <details>
@@ -7,7 +102,6 @@
 Linux: `ip a` `ip link show` `ifconfig -a`
 	
 Win: `ipconfig /all`
-	
 	
 <br>**2 Какой протокол используется для распознавания соседа по сетевому интерфейсу? Какой пакет и команды есть в Linux для этого?**
 
@@ -81,8 +175,6 @@ bonds:
         mode: balance-alb
         mii-monitor-interval: 2
 ```
-
-	
 	
 <br>**5 Сколько IP адресов в сети с маской /29 ? Сколько /29 подсетей можно получить из сети с маской /24. Приведите несколько примеров /29 подсетей внутри сети 10.10.10.0/24.**
 ```
