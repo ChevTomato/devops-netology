@@ -1,3 +1,151 @@
+
+## Домашнее задание к занятию "3.9. Элементы безопасности информационных систем"
+
+<details>
+
+<br>**1 Установите Bitwarden плагин для браузера. Зарегестрируйтесь и сохраните несколько паролей**
+
+`Установил, зарегистрировался, синхронизировал`
+
+<br>**2 Установите Google authenticator на мобильный телефон. Настройте вход в Bitwarden акаунт через Google authenticator OTP**
+	
+`Установил, настроил`
+	
+<br>**3 Установите apache2, сгенерируйте самоподписанный сертификат, настройте сайт для работы по HTTPS**<br>
+	
+ Устанавливаем `$ sudo apt update` `$ sudo apt install apache2`<br>
+ Разрешаем `$ sudo ufw allow "Apache Full"`<br>
+ Подключаем SSL mod	`$ sudo a2enmod ssl`<br>
+ Рестартим	`$ sudo systemctl restart apache2`<br><br>
+ Создаём SSL сертификат:
+```	
+$ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt -subj "/C=RU/ST=Moscow/L=Moscow/O=Netology/OU=Org/CN=192.168.0.17"
+```
+<br>
+	
+Настраиваем Apache для использования SSL: `$ sudo vim /etc/apache2/sites-available/192.168.0.17.conf`
+<br>	
+```
+<VirtualHost *:443>   
+	ServerName 192.168.0.17   
+	DocumentRoot /var/www/192.168.0.17   
+	SSLEngine on   
+	SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt   
+	SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+</VirtualHost>
+```
+Создаём корневую деррикторию нашего сайта `$ sudo mkdir /var/www/192.168.0.17`<br>
+Создаём в корне наш index.html `$ sudo nano /var/www/192.168.0.17/index.html`	
+```
+<h1>it worked!</h1>
+```
+Включаем наш новый сайт в Апаче, тестируем на ошибки, рестартим:
+```
+sudo a2ensite your_domain_or_ip.conf
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+```
+![dz-apacha](https://user-images.githubusercontent.com/95047357/155121572-0964790b-0209-4850-aa25-a8577b9d19a9.PNG)
+	
+	
+<br><br>
+	
+**4 Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК и тому подобное...)**
+
+	$ git clone --depth 1 https://github.com/drwetter/testssl.sh.git
+	$ ./testssl.sh -U --sneaky https://www.netology.ru
+
+	SWEET32  VULNERABLE, uses 64 bit block ciphers
+	TLS1: 	 VULNERABLE -- but also supports higher protocols  TLSv1.1 TLSv1.2 (likely mitigated)
+	LUCKY13  potentially VULNERABLE, uses cipher block chaining (CBC) ciphers with TLS. Check patches
+
+
+<br><br>**5 Установите на Ubuntu ssh сервер, сгенерируйте новый приватный ключ. Скопируйте свой публичный ключ на другой сервер. Подключитесь к серверу по SSH-ключу**
+	
+Устанавливаем `$ sudo apt install openssh-server`<br>
+Проверяем `$ sudo systemctl status ssh`<br>
+Генерируем ключ на клиенте `$ ssh-keygen`<br>
+Копируем его на сервер `$ ssh-copy-id -i ~/.ssh/id_rsa  chev@192.168.0.103`<br>
+Подключаемся `ssh chev@192.168.0.103`<br>
+
+<br><br>**6 Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера**
+
+	$ mv .ssh/id_rsa .ssh/vagrant_rsa
+	$ mv .ssh/id_rsa.pub .ssh/vagrant_rsa.pub
+	$ vim .ssh/config
+	    Host server
+    		 HostName 192.168.0.103
+    		 User chev
+    		 Port 22
+    		 IdentityFile ~/.ssh/vagrant_rsa
+	
+	$ ssh server
+		profit
+
+<br><br>**7 Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark**
+
+	$ tcpdump -D
+	$ sudo tcpdump -w dump.pcap -c 100 -i eth0
+	
+```
+Опции утилиты tcpdump
+-i Задает интерфейс, с которого необходимо анализировать трафик (без указания интерфейса - анализ "первого попавшегося").
+-n Отключает преобразование IP в доменные имена. nn - запрещается преобразование номеров портов в название протокола.
+-e Включает вывод данных канального уровня (например, MAC-адреса).
+-v Вывод дополнительной информации (TTL, опции IP).
+-s Указание размера захватываемых пакетов. (по-умолчанию - пакеты больше 68 байт)
+-w Задать имя файла, в который сохранять собранную информацию.
+-r Чтение дампа из заданного файла.
+-p Захватывать только трафик, предназначенный данному узлу. (захват всех пакетов, например в том числе широковещательных).
+-q Переводит tcpdump в "бесшумный режим", пакет анализируется на транспортном уровне (TCP, UDP, ICMP), а не на сетевом (IP).
+-t Отключает вывод меток времени.
+```
+	
+![shark](https://user-images.githubusercontent.com/95047357/155134063-fddfbd53-403e-4832-8d44-4012b41cea43.JPG)
+
+	
+<br><br>**8 Просканируйте хост scanme.nmap.org. Какие сервисы запущены?**
+
+	$ nmap scanme.nmap.org
+```
+PORT      STATE SERVICE
+22/tcp    open  ssh		Secure Shell
+80/tcp    open  http		Hypertext Transfer Protocol
+9929/tcp  open  nping-echo	Network packet generation tool / ping utility
+31337/tcp open  Elite 		Cult of the Dead Cow Protocol 
+```
+<br><br>**9 Установите и настройте фаервол ufw на web-сервер из задания 3. Откройте доступ снаружи только к портам 22,80,443**
+
+	$ ufw status
+	Status: inactive
+	$ ufw enable
+	$ ufw status verbose
+	Status: active
+	Logging: on (low)
+	Default: deny (incoming), allow (outgoing), disabled (routed)
+	New profiles: skip
+	To                         Action      From
+	--                         ------      ----
+	80,443/tcp (Apache Full)   ALLOW IN    Anywhere
+	22                         ALLOW IN    Anywhere
+
+
+<br>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Домашнее задание к занятию "3.8. Компьютерные сети, лекция 3"
 
 <details>
