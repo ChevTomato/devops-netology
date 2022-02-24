@@ -69,7 +69,7 @@ $ sudo systemctl reload apache2
 
 <br><br>**6 Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера**
 
-`$ mv .ssh/id_rsa .ssh/vagrant_rsa` `$ mv .ssh/id_rsa.pub .ssh/vagrant_rsa.pub` `$ vim .ssh/config`
+`$ mv .ssh/id_rsa .ssh/vagrant_rsa` `$ mv .ssh/id_rsa.pub .ssh/vagrant_rsa.pub` `$ vim .ssh/config`:
 ```	    
 Host server
 	HostName 192.168.0.103
