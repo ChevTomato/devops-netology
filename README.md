@@ -39,12 +39,12 @@ $ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/priv
 ```
 <h1>it worked!</h1>
 ```
-Включаем наш новый сайт в Апаче, тестируем на ошибки, рестартим:
-```
-$ sudo a2ensite your_domain_or_ip.conf
-$ sudo apache2ctl configtest
-$ sudo systemctl reload apache2
-```
+
+
+Включаем наш новый сайт в Апаче `$ sudo a2ensite 192.168.0.17`<br>
+Тестируем на ошибки синтаксиса `$ sudo apache2ctl configtest`<br>
+Рестартим `$ sudo systemctl reload apache2`
+
 ![dz-apacha](https://user-images.githubusercontent.com/95047357/155121572-0964790b-0209-4850-aa25-a8577b9d19a9.PNG)
 	
 	
