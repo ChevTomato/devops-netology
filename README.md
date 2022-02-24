@@ -41,9 +41,9 @@ $ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/priv
 ```
 Включаем наш новый сайт в Апаче, тестируем на ошибки, рестартим:
 ```
-sudo a2ensite your_domain_or_ip.conf
-sudo apache2ctl configtest
-sudo systemctl reload apache2
+$ sudo a2ensite your_domain_or_ip.conf
+$ sudo apache2ctl configtest
+$ sudo systemctl reload apache2
 ```
 ![dz-apacha](https://user-images.githubusercontent.com/95047357/155121572-0964790b-0209-4850-aa25-a8577b9d19a9.PNG)
 	
@@ -52,8 +52,7 @@ sudo systemctl reload apache2
 	
 **4 Проверьте на TLS уязвимости произвольный сайт в интернете (кроме сайтов МВД, ФСБ, МинОбр, НацБанк, РосКосмос, РосАтом, РосНАНО и любых госкомпаний, объектов КИИ, ВПК и тому подобное...)**
 
-	$ git clone --depth 1 https://github.com/drwetter/testssl.sh.git
-	$ ./testssl.sh -U --sneaky https://www.netology.ru
+`$ git clone --depth 1 https://github.com/drwetter/testssl.sh.git` `$ ./testssl.sh -U --sneaky https://www.netology.ru`
 
 	SWEET32  VULNERABLE, uses 64 bit block ciphers
 	TLS1: 	 VULNERABLE -- but also supports higher protocols  TLSv1.1 TLSv1.2 (likely mitigated)
@@ -70,17 +69,15 @@ sudo systemctl reload apache2
 
 <br><br>**6 Переименуйте файлы ключей из задания 5. Настройте файл конфигурации SSH клиента, так чтобы вход на удаленный сервер осуществлялся по имени сервера**
 
-	$ mv .ssh/id_rsa .ssh/vagrant_rsa
-	$ mv .ssh/id_rsa.pub .ssh/vagrant_rsa.pub
-	$ vim .ssh/config
-	    Host server
-    		 HostName 192.168.0.103
-    		 User chev
-    		 Port 22
-    		 IdentityFile ~/.ssh/vagrant_rsa
-	
-	$ ssh server
-		profit
+`$ mv .ssh/id_rsa .ssh/vagrant_rsa` `$ mv .ssh/id_rsa.pub .ssh/vagrant_rsa.pub` `$ vim .ssh/config`
+```	    
+Host server
+	HostName 192.168.0.103
+	User chev
+	Port 22
+	IdentityFile ~/.ssh/vagrant_rsa
+```	
+Подключаемся `$ ssh server`
 
 <br><br>**7 Соберите дамп трафика утилитой tcpdump в формате pcap, 100 пакетов. Откройте файл pcap в Wireshark**
 
@@ -116,19 +113,21 @@ PORT      STATE SERVICE
 ```
 <br><br>**9 Установите и настройте фаервол ufw на web-сервер из задания 3. Откройте доступ снаружи только к портам 22,80,443**
 
-	$ ufw status
-	Status: inactive
-	$ ufw enable
-	$ ufw status verbose
-	Status: active
-	Logging: on (low)
-	Default: deny (incoming), allow (outgoing), disabled (routed)
-	New profiles: skip
-	To                         Action      From
-	--                         ------      ----
-	80,443/tcp (Apache Full)   ALLOW IN    Anywhere
-	22                         ALLOW IN    Anywhere
-
+Узнаём статус файрвола `$ sudo ufw status`<br>
+Запускаем `$ sudo ufw enable`<br>
+Запрещаем входящие `sudo ufw default deny incoming`<br>
+Разрешаем исходящие `sudo ufw default allow outgoing`<br>
+Добавляем сервисы из /etc/services `sudo ufw allow ssh` `sudo ufw allow 80` `sudo ufw allow https`<br>
+Проверяем `$ sudo ufw status verbose`
+```	
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+To                         Action      From
+80,443/tcp (Apache Full)   ALLOW IN    Anywhere
+22                         ALLOW IN    Anywhere
+```
 
 <br>
 </details>
