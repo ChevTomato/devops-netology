@@ -1094,8 +1094,9 @@ Vagrant.configure("2") do |config|
 
 
 
-## devops-netology
- hello netology!
+## Devops-Netology
+ 
+<details>
 
 благодаря добавленному .gitignore, будут проигнорированны файлы:
 
@@ -1105,4 +1106,5 @@ Vagrant.configure("2") do |config|
 	override?! override.tf override.tf.json *_override.tf *_override.tf.json
 	tfplan?! *tfplan*
 	конфигурации командной строки: .terraformrc terraform.rc
-	New line
+	New line<br><br>
+</details>
