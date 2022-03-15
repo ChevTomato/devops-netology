@@ -38,17 +38,20 @@ done
 
 ### Ваш скрипт:
 ```bash
+
 #!/usr/bin/env bash
 
-while :
+while ((1==1))
 do
   if ! curl https://localhost:4757
   then
     date >> curl.log
-    exit 1
+  else
+    break
   fi
-  sleep 1
+  sleep 10
 done
+
 ```
 
 ## Обязательная задача 3
