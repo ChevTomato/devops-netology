@@ -38,6 +38,8 @@ done
 
 ### Ваш скрипт:
 ```bash
+#!/usr/bin/env bash
+
 while ((1==1))
 do
 	curl https://localhost:4757
@@ -55,7 +57,7 @@ done
 
 ### Ваш скрипт:
 ```bash
-#!/bin/bash
+ #!/usr/bin/env bash
 
 run_test(){
  for ((i=1; i < 6; i++)); do
@@ -82,7 +84,7 @@ run_test "87.250.250.242"
 
 ### Ваш скрипт:
 ```bash
-#!/bin/bash
+ #!/usr/bin/env bash
 
 run_test(){
  while :; do
