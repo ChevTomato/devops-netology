@@ -40,15 +40,14 @@ done
 ```bash
 #!/usr/bin/env bash
 
-while ((1==1))
+while :
 do
-	curl https://localhost:4757
-	if (($? != 0))
-	then	
-		date >> curl.log
-	else exit
-	fi
-	sleep 5
+  if ! curl https://localhost:4757
+  then
+    date >> curl.log
+    exit 1
+  fi
+  sleep 1
 done
 ```
 
