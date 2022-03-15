@@ -57,7 +57,7 @@ done
 
 ### Ваш скрипт:
 ```bash
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 run_test(){
  for ((i=1; i < 6; i++)); do
@@ -84,7 +84,7 @@ run_test "87.250.250.242"
 
 ### Ваш скрипт:
 ```bash
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 run_test(){
  while :; do
