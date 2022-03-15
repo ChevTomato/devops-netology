@@ -55,18 +55,26 @@ done
 
 ### Ваш скрипт:
 ```bash
-#!/usr/bin/env bash
-hosts=(192.168.0.1 173.194.222.113 87.250.250.242)
-timeout=5
-for i in {1..5}
-do
-date >> test.log
-     for n in ${hosts[@]}
-     do	
-	 curl -ls --connect-timeout $timeout $n:80 >/dev/null
-	 echo "checking" $n status=$? >>hosts.log
-     done
-done
+#!/bin/bash
+
+run_test(){
+ for ((i=1; i < 6; i++)); do
+  curl http://$1:80
+
+  if [ $? == "0" ]; then
+   result="online"
+  else
+   result="fail"
+  fi
+
+  date_time="$(date)"
+  echo $date_time $1 $result >> curl.log
+ done
+}
+
+run_test "192.168.0.1"
+run_test "173.194.222.113"
+run_test "87.250.250.242"
 ```
 
 ## Обязательная задача 4
@@ -74,23 +82,25 @@ done
 
 ### Ваш скрипт:
 ```bash
-#!/usr/bin/env bash
-hosts=(192.168.0.1 173.194.222.113 87.250.250.24)
-timeout=5
-res=0
+#!/bin/bash
 
-while (($res == 0))
-do
-    for n in ${hosts[@]}
-    do
-	curl -Is --connect-timeout $timeout $n:80 >/dev/null
-	res=$?
-	if (($res != 0))
-	then
-	    echo "ERROR at" $n status=$res >> error.log
-	fi
-    done
-done
+run_test(){
+ while :; do
+  curl http://$1:80 > /dev/null #2>&1
+
+  if (( $? != 0 )); then
+   date_time="$(date)"
+   echo $date_time $1 Fail >> error.log
+   exit 1
+  fi
+
+  sleep 2
+ done
+}
+
+run_test "192.168.0.1"
+run_test "173.194.222.113"
+run_test "87.250.250.242"
 ```	
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
