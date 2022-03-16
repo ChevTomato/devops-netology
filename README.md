@@ -66,9 +66,9 @@ run_test(){
   curl http://$1:80
 
   if [ $? == "0" ]; then
-   result="online"
+   result="active"
   else
-   result="fail"
+   result="failed"
   fi
 
   date_time="$(date)"
