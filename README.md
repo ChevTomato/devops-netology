@@ -47,7 +47,7 @@ do
   then
     date >> curl.log
   else
-    break
+    exit
   fi
   sleep 10
 done
