@@ -43,7 +43,8 @@ done
 
 while ((1==1))
 do
-  if ! curl https://localhost:4757
+  curl https://localhost:4757
+  if (( $? != 0 ))
   then
     date >> curl.log
   else
