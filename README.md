@@ -56,7 +56,7 @@ for result in result_os.split('\n'):
 ```
 
 ### Вывод скрипта при запуске при тестировании:
-```
+```python
 import os
 import sys
 import git
