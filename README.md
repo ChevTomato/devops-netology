@@ -65,37 +65,26 @@ $ python3 2.py
 ```python
 import os
 import sys
-import git
 
-try:
- path = sys.argv[1]
-except Exception:
-  print('Input path to git repository')
-  path = input()
+if len(sys.argv) < 2:
+    sys.exit()
+    
+bash_command_path = [f"cd {sys.argv[1]}", "pwd"]
+path = os.popen(' && '.join(bash_command_path)).read().rstrip() + '/'
 
-if os.path.exists(path):
-    try:
-        git.Repo(path).git_dir
-
-        bash_commands = ["cd " + path, "git status"]
-        try:
-           result_os = os.popen(' && '.join(bash_commands)).read()
-        except git.exc.GitError as e:
-           print(e)
-           exit(1)
-        for result in result_os.split('\n'):
-            if result.find('modified') != -1:
-               prepare_result = os.path.join(path, (result.replace('\tmodified:   ', '')))
-               print(prepare_result)
-    except git.exc.InvalidGitRepositoryError:
-        print(f'Git repository not found in {path} !')
-else:
-    print('Path not exists!')
+bash_command = [f"cd {sys.argv[1]}", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
+for result in result_os.split('\n'):
+    if result.find('modified') != -1:
+        prepare_result = result.replace('\tmodified:   ', '')
+        print(path + prepare_result)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+$ python3 3.py ~/sysadm-homeworks/
+/home/vagrant/sysadm-homeworks/README.md
 ```
 
 ## Обязательная задача 4
@@ -103,12 +92,28 @@ else:
 
 ### Ваш скрипт:
 ```python
-???
+from socket import gethostbyname
+
+file = open("test_file", "r")
+lines = file.readlines()
+dns = {line.split()[0]: line.split()[1] for line in lines}
+
+for name in dns.keys():
+    if gethostbyname(name) != dns[name]:
+        print(f"[ERROR] {name} IP mismatch: {dns[name]} {gethostbyname(name)}")
+
+    print(f"{name}: {gethostbyname(name)}")
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+$ python3 4.py
+[ERROR] drive.google.com IP mismatch: 0.0.0.0 173.194.73.194
+drive.google.com: 173.194.73.194
+[ERROR] mail.google.com IP mismatch: 0.0.0.0 173.194.73.19
+mail.google.com: 173.194.73.19
+[ERROR] google.com IP mismatch: 0.0.0.0 74.125.205.101
+google.com: 74.125.205.101
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
