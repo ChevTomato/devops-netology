@@ -39,25 +39,23 @@ for result in result_os.split('\n'):
 ### Ваш скрипт:
 ```python
 import os
-import git
 
-path = os.path.abspath(os.curdir)
+bash_command_path = ["cd ~/sysadm-homeworks", "pwd"]
+path = os.popen(' && '.join(bash_command_path)).read().rstrip() + '/'
 
-bash_commands = ["cd " + path, "git status"]
-try:
-   result_os = os.popen(' && '.join(bash_commands)).read()
-except git.GitError as e:
-   print(e)
-   exit(1)
+bash_command = ["cd ~/sysadm-homeworks", "git status"]
+result_os = os.popen(' && '.join(bash_command)).read()
+is_change = False
 for result in result_os.split('\n'):
     if result.find('modified') != -1:
-        prepare_result = os.path.join(path, (result.replace('\tmodified:   ', '')))
-        print(prepare_result)
+        prepare_result = result.replace('\tmodified:   ', '')
+        print(path + prepare_result)
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
----
+$ python3 2.py
+/home/vagrant/sysadm-homeworks/README.md
 ```
 
 ## Обязательная задача 3
