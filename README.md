@@ -28,22 +28,60 @@
 
 ### Ваш скрипт:
 ```python
-???
+import json
+import yaml
+from socket import gethostbyname
+
+file_name = "test"
+with open(file_name, "r") as file:
+    lines = file.readlines()
+
+dns = {line.split()[0]: line.split()[1] for line in lines}
+
+for name in dns.keys():
+    if gethostbyname(name) != dns[name]:
+        print(f"[ERROR] {name} IP mismatch: {dns[name]} {gethostbyname(name)}")
+        dns[name] = gethostbyname(name)
+
+    # Save plain text
+    with open(file_name, "w") as plain_file:
+        for dns_item in dns:
+            plain_file.write(f"{dns_item}\t{dns[dns_item]}\n")
+
+    # Save JSON
+    with open(f"{file_name}.json", "w") as json_file:
+        json_file.write(json.dumps(dns, indent=4))
+
+    # Save YAML
+    with open(f"{file_name}.yaml", "w") as yaml_file:
+        yaml_file.write(yaml.dump(dns, indent=4, sort_keys=False, explicit_start=True, explicit_end=True))
 ```
 
 ### Вывод скрипта при запуске при тестировании:
 ```
-???
+[ERROR] drive.google.com IP mismatch: 0.0.0.0 74.125.131.194
+[ERROR] mail.google.com IP mismatch: 0.0.0.0 74.125.131.17
+[ERROR] google.com IP mismatch: 0.0.0.0 64.233.162.139
 ```
 
 ### json-файл(ы), который(е) записал ваш скрипт:
 ```json
-???
+{
+    "drive.google.com": "74.125.131.194",
+    "mail.google.com": "74.125.131.17",
+    "google.com": "64.233.162.139",
+    "mail.yandex.ru": "77.88.21.37"
+}
 ```
 
 ### yml-файл(ы), который(е) записал ваш скрипт:
 ```yaml
-???
+---
+drive.google.com: 74.125.131.194
+mail.google.com: 74.125.131.17
+google.com: 64.233.162.139
+mail.yandex.ru: 77.88.21.37
+...
 ```
 
 ## Дополнительное задание (со звездочкой*) - необязательно к выполнению
